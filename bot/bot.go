@@ -1,30 +1,70 @@
 package bot
 
+import (
+	"slices"
+	"strings"
+)
+
 type Request struct {
 	Msisdn     string
 	Prompt     string
 	Parameters map[string]string
 }
 
-var location map[string]string
-
 type Menu struct {
 	Name string
 	Body string
 }
 
-func ProcessRequest(r *Request) (string, string) {
-	location, err := location[r.Msisdn]
+func (m Menu) String() string {
+	result := strings.ReplaceAll(m.Body, "\n{{errors}}\n", "")
+	return result
+}
 
-	if !err {
-		menu := getMenu("init", r.Parameters)
+type Session struct {
+	Location    string
+	Parameters  map[string]string
+	CurrentMenu *Menu
+}
 
-		return menu.Body, menu.Name
+var sessions map[string]*Session = make(map[string]*Session)
+
+func ProcessRequest(r *Request) Menu {
+	session, ok := sessions[r.Msisdn]
+
+	if session == nil || !ok {
+		menu := getMenu("000_init", r.Parameters)
+		sessions[r.Msisdn] = &Session{
+			Location:    menu.Name,
+			Parameters:  r.Parameters,
+			CurrentMenu: &menu,
+		}
+
+		return menu
 	}
 
-	switch location {
-	case "init":
+	menu := getMenu(session.Location, r.Parameters)
+	switch session.Location {
+	case "000_init":
+		menu = ProcessInit(r)
+
+	case "002_recommend":
+		menu = getMenu("020_recommended", r.Parameters)
+
+	case "004_evaluate":
+		menu = getMenu("040_evaluated", r.Parameters)
+
+	default:
+		menu = getMenu("000_init", r.Parameters)
 	}
 
-	return "", ""
+	if slices.Contains([]string{"001_talktoadmin", "003_info", "020_recommended", "040_evaluated"}, menu.Name) {
+		delete(sessions, r.Msisdn)
+
+		return menu
+	}
+
+	sessions[r.Msisdn].CurrentMenu = &menu
+	sessions[r.Msisdn].Location = menu.Name
+	return menu
 }
