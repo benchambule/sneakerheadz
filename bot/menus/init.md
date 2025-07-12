@@ -1,6 +1,8 @@
 *SneakerHeadZ*
 
-Ola {client_name}, as sapatilhas *{product_name}* sao uma optima escolha:
+{errors}
+
+Ola {{client_name}}, as sapatilhas *{{product_name}}* sao uma optima escolha:
 
 Podemos te ajudar a:
 

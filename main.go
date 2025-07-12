@@ -2,8 +2,12 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/benchambule/sneakerheadz/bot"
 )
 
 func main() {
-	fmt.Println("Hello world!")
+	menu, name := bot.ProcessRequest(&bot.Request{Msisdn: "258849902174", Prompt: ""})
+
+	fmt.Println(menu, name)
 }
