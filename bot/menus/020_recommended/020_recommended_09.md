@@ -1,0 +1,1 @@
+Obrigado por dedicar o seu tempo a recomendar os nossos serviços/produtos.

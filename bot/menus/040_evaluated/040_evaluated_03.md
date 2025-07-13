@@ -1,0 +1,1 @@
+Agradecemos a sua colaboração ao nos fornecer a avaliação.

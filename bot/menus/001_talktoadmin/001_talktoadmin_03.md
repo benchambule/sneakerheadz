@@ -1,0 +1,1 @@
+Entraremos em contacto através de um administrador. Pode igualmente enviar-nos uma mensagem neste espaço.

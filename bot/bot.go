@@ -29,16 +29,23 @@ type Session struct {
 
 var sessions map[string]*Session = make(map[string]*Session)
 
+func HasSession(msisdn string) bool {
+	_, ok := sessions[msisdn]
+	return ok
+}
+
 func ProcessRequest(r *Request) Menu {
 	session, ok := sessions[r.Msisdn]
 
 	if session == nil || !ok {
 		menu := getMenu("000_init", r.Parameters)
-		sessions[r.Msisdn] = &Session{
-			Location:    menu.Name,
-			Parameters:  r.Parameters,
-			CurrentMenu: &menu,
-		}
+		// TODO: Uncomment this when sessions are implemented
+
+		// sessions[r.Msisdn] = &Session{
+		// 	Location:    menu.Name,
+		// 	Parameters:  r.Parameters,
+		// 	CurrentMenu: &menu,
+		// }
 
 		return menu
 	}
@@ -46,7 +53,7 @@ func ProcessRequest(r *Request) Menu {
 	menu := getMenu(session.Location, r.Parameters)
 	switch session.Location {
 	case "000_init":
-		menu = ProcessInit(r)
+		menu = processInit(r)
 
 	case "002_recommend":
 		menu = getMenu("020_recommended", r.Parameters)

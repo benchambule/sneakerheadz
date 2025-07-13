@@ -2,18 +2,27 @@ package bot
 
 import (
 	"embed"
+	"fmt"
+	"math/rand"
 	"strings"
+	"time"
 )
 
-//go:embed menus/*.md
+//go:embed menus/*
 var menus embed.FS
 
 func getMenu(name string, params map[string]string) Menu {
-	content, _ := menus.ReadFile("menus/" + name + ".md")
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	n := fmt.Sprintf("%02d", r.Intn(10))
+	filename := fmt.Sprintf("menus/%s/%s_%s.md", name, name, n)
+
+	content, _ := menus.ReadFile(filename)
 
 	menu := Menu{}
 
 	menu.Body = string(content)
+	menu.Body = strings.Split(menu.Body, "-------------")[0]
 	menu.Name = name
 
 	for key, value := range params {
@@ -23,7 +32,7 @@ func getMenu(name string, params map[string]string) Menu {
 	return menu
 }
 
-func ProcessInit(r *Request) Menu {
+func processInit(r *Request) Menu {
 	if r == nil {
 		panic("Request cannot be null")
 	}

@@ -1,0 +1,1 @@
+Agradecemos sinceramente pela sua avaliação.

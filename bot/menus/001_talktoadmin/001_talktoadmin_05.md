@@ -1,0 +1,1 @@
+Dentro de instantes, um administrador estabelecerá contacto consigo. Se preferir, pode deixar a sua questão neste chat.
