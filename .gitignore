@@ -27,5 +27,4 @@ __debug*
 
 .vscode/
 
-whatsmeow.db
 *.db
