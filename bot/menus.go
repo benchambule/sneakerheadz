@@ -14,8 +14,9 @@ var menus embed.FS
 func getMenu(name string, params map[string]string) Menu {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	n := fmt.Sprintf("%02d", r.Intn(10))
+	n := fmt.Sprintf("%02d", r.Intn(20))
 	filename := fmt.Sprintf("menus/%s/%s_%s.md", name, name, n)
+	fmt.Println("Loading menu from:", filename)
 
 	content, _ := menus.ReadFile(filename)
 

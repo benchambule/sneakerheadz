@@ -35,6 +35,12 @@ func HasSession(msisdn string) bool {
 }
 
 func ProcessRequest(r *Request) Menu {
+	menu := getMenu("000_init", r.Parameters)
+
+	return menu
+}
+
+func ProcessRequest1(r *Request) Menu {
 	session, ok := sessions[r.Msisdn]
 
 	if session == nil || !ok {

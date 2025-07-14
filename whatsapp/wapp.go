@@ -24,6 +24,7 @@ func extractProductMT(input string) (string, float64, bool) {
 	input = strings.ReplaceAll(input, " ", " ")    // Replace non-breaking spaces with regular spaces
 	input = strings.ReplaceAll(input, " - ", " ")  // Remove hyphens surrounded by spaces
 	input = strings.ReplaceAll(input, "MT", " MT") // Ensure "MT" is separated by a space for easier parsing
+	input = strings.ReplaceAll(input, "  ", " ")   // Remove double spaces
 
 	if !strings.HasSuffix(input, "MT") {
 		return "", 0, false
@@ -124,12 +125,27 @@ func GetEventHandler(client *whatsmeow.Client) func(interface{}) {
 					return
 				}
 
-				if extend.ContextInfo.QuotedMessage.Conversation == nil {
-					fmt.Println("No conversation found in the quoted message.")
+				var input string = ""
+
+				if extend.ContextInfo.QuotedMessage.Conversation != nil {
+					input = extend.ContextInfo.QuotedMessage.GetConversation()
+				}
+
+				if extend.ContextInfo.QuotedMessage.ImageMessage != nil {
+					input = *extend.ContextInfo.QuotedMessage.ImageMessage.Caption
+				}
+
+				if extend.ContextInfo.QuotedMessage.VideoMessage != nil {
+					input = *extend.ContextInfo.QuotedMessage.VideoMessage.Caption
+				}
+
+				fmt.Println("Quoted Message:", input)
+
+				if input == "" {
+					fmt.Println("Quoted message is empty. Cannot process.")
 					return
 				}
 
-				input := extend.ContextInfo.QuotedMessage.GetConversation()
 				product_name, product_price, ok := extractProductMT(input)
 
 				if !ok {
@@ -140,6 +156,9 @@ func GetEventHandler(client *whatsmeow.Client) func(interface{}) {
 				client_name := v.Info.PushName
 				fifty_percent := product_price / 2
 				now := time.Now()
+
+				client.MarkRead([]types.MessageID{v.Info.ID}, v.Info.Timestamp.Add(time.Second), v.Info.Chat, v.Info.Sender)
+				client.SendChatPresence(v.Info.Chat, types.ChatPresenceComposing, types.ChatPresenceMediaText)
 
 				request := &bot.Request{
 					Msisdn: "258849902174",
@@ -156,8 +175,6 @@ func GetEventHandler(client *whatsmeow.Client) func(interface{}) {
 
 				resp := bot.ProcessRequest(request)
 
-				client.MarkRead([]types.MessageID{v.Info.ID}, v.Info.Timestamp.Add(time.Second), v.Info.Chat, v.Info.Sender)
-				client.SendChatPresence(v.Info.Chat, types.ChatPresenceComposing, types.ChatPresenceMediaText)
 				time.Sleep(time.Second * 5)
 
 				client.SendMessage(context.Background(), v.Info.Chat, &waProto.Message{Conversation: proto.String(resp.Body)})
